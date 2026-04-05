@@ -61,4 +61,4 @@ WORKDIR /work/project
 # Sanity checks (optional but helpful)
 RUN set -eux; \
   m68k-atari-mintelf-gcc --version; \
-  vasmm68k_mot -version || true
+  vasmm68k_mot -v || true
