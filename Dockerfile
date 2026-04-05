@@ -55,9 +55,6 @@ RUN set -eux; \
   git clone --depth 1 https://github.com/ktz-st/libcmini.elf libcmini; \
   git clone --depth 1 https://github.com/ktz-st/godlib.elf godlib
 
-# Default place where another repo can be checked out (project)
-WORKDIR /work/project
-
 # Sanity checks (optional but helpful)
 RUN set -eux; \
   m68k-atari-mintelf-gcc --version; \
