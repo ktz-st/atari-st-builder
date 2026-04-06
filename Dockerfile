@@ -83,7 +83,7 @@ RUN set -eux; \
   # Cleanup source and archive
   cd /; \
   rm -rf /tmp/fpc/FPCSource
-COPY fpc.cfg /opt/fpc/etc/fpc.cfg
+COPY fpc.cfg /opt/fpc/lib/fpc/etc/fpc.cfg
 
 # ---- Verify installations ----
   RUN set -eux; \
