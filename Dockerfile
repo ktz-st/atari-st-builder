@@ -89,7 +89,7 @@ COPY fpc.cfg /opt/fpc/etc/fpc.cfg
   RUN set -eux; \
   m68k-atari-mintelf-gcc --version; \
   vasmm68k_mot -v || true; \
-  vasm68k_std -v || true; \
+  vasmm68k_std -v || true; \
   vlink -v || true; \
   fpc -iV; \
   ppcross68k -iV || true
