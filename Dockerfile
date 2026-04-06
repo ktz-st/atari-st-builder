@@ -45,7 +45,7 @@ RUN set -eux; \
   make CPU=m68k SYNTAX=std; \
   install -m 0755 vasmm68k_mot /usr/local/bin/vasmm68k_mot; \
   install -m 0755 vasmm68k_std /usr/local/bin/vasmm68k_std; \
-  ln -s /usr/local/bin/vasmm68k_std /usr/local/bin/m68k-atari-mint-vasmm68k_std; \
+  ln -s /usr/local/bin/vasmm68k_std /usr/local/bin/m68k-atari-vasmm68k_std; \
   cd /; \
   rm -rf /tmp/vasm;
 
