@@ -32,19 +32,34 @@ RUN set -eux; \
   rm -f *.tar.xz
 
 # Make sure /usr/local/bin is on PATH (it is usually, but keep explicit)
-ENV PATH="/usr/local/bin:/usr/bin:/bin:${PATH}"
+ENV PATH="/usr/local/bin:/usr/bin:/bin:/opt/fpc/lib/fpc/3.3.1:${PATH}"
 
 # ---- Build and install VASM (vasmm68k_mot) ----
 WORKDIR /tmp/vasm
 RUN set -eux; \
-  wget -O vasm.tar.gz "http://sun.hasenbraten.de/vasm/daily/vasm.tar.gz"; \
+  wget -O vasm.tar.gz "http://sun.hasenbraten.de/vasm/release/vasm.tar.gz"; \
   tar -xzf vasm.tar.gz; \
   # archive unpacks into "vasm/" directory
   cd vasm; \
   make CPU=m68k SYNTAX=mot; \
+  make CPU=m68k SYNTAX=std; \
   install -m 0755 vasmm68k_mot /usr/local/bin/vasmm68k_mot; \
+  install -m 0755 vasm68k_std /usr/local/bin/vasm68k_std; \
+  ln -s /usr/local/bin/vasmm68k_std /usr/local/bin/m68k-atari-mint-vasmm68k_std; \
   cd /; \
-  rm -rf /tmp/vasm
+  rm -rf /tmp/vasm;
+
+# ---- Build and install VLINK ----
+WORKDIR /tmp/vlink
+RUN set -eux; \
+  wget -O vlink.tar.gz "http://sun.hasenbraten.de/vlink/release/vlink.tar.gz"; \
+  tar -xzf vlink.tar.gz; \
+  # archive unpacks into "vlink/" directory
+  cd vlink; \
+  make; \
+  install -m 0755 vlink /usr/local/bin/vlink; \
+  cd /; \
+  rm -rf /tmp/vlink
 
 # ---- Prepare workspace layout expected by project Makefile ----
 # project Makefile uses:
@@ -55,7 +70,26 @@ RUN set -eux; \
   git clone --depth 1 https://github.com/ktz-st/libcmini.elf libcmini; \
   git clone --depth 1 https://github.com/ktz-st/godlib.elf godlib
 
-# Sanity checks (optional but helpful)
+# ---- Build and install FreePascal ----
+WORKDIR /tmp/fpc
 RUN set -eux; \
+  wget -O fpc-laz_3.2.2-210709_amd64.deb "https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%204.6/fpc-laz_3.2.2-210709_amd64.deb/download"; \
+  dpkg -i fpc-laz_3.2.2-210709_amd64.deb; \
+  rm -f fpc-laz_3.2.2-210709_amd64.deb; \
+  git clone https://github.com/fpc/FPCSource; \
+  cd FPCSource; \
+  # Build the compiler (this will take a while)
+  make clean crossall crossinstall OS_TARGET=atari CPU_TARGET=m68k CROSSOPT="-Avasm -Cp68000" INSTALL_PREFIX="/opt/fpc"; \
+  # Cleanup source and archive
+  cd /; \
+  rm -rf /tmp/fpc/FPCSource
+COPY fpc.cfg /opt/fpc/etc/fpc.cfg
+
+# ---- Verify installations ----
+  RUN set -eux; \
   m68k-atari-mintelf-gcc --version; \
-  vasmm68k_mot -v || true
+  vasmm68k_mot -v || true; \
+  vasm68k_std -v || true; \
+  vlink -v || true; \
+  fpc -iV; \
+  ppcross68k -iV || true
