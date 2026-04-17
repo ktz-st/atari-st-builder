@@ -7,6 +7,7 @@ Includes:
 - `vasmm68k_mot` built from the daily VASM tarball
 - `ktz-st/libcmini.elf` cloned to `/work/libcmini`
 - `ktz-st/godlib.elf` cloned to `/work/godlib`
+- FreePascal
 
 Default working directory:
 - `/work/project`
