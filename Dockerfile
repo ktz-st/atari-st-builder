@@ -12,6 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     xz-utils \
     build-essential \
     wget \
+    unzip \
+    libfreeimage-dev \
+    rsync \
     && rm -rf /var/lib/apt/lists/*
 
 # ---- Install MiNT ELF toolchain by extracting tarballs directly to / ----
@@ -24,6 +27,21 @@ RUN set -eux; \
   wget -O mintlib.tar.xz  "https://tho-otto.de/download/mint/mintlib-0.60.1-mintelf-20240718-dev.tar.xz"; \
   wget -O fdlibm.tar.xz   "https://tho-otto.de/download/mint/fdlibm-20240425-mintelf-dev.tar.xz"; \
   wget -O gemlib.tar.xz   "https://tho-otto.de/download/mint/gemlib-0.44.0-mintelf-20240425-dev.tar.xz"; \
+  tar -C / -xJf binutils.tar.xz; \
+  tar -C / -xJf gcc.tar.xz; \
+  tar -C / -xJf mintlib.tar.xz; \
+  tar -C / -xJf fdlibm.tar.xz; \
+  tar -C / -xJf gemlib.tar.xz; \
+  rm -f *.tar.xz
+
+  WORKDIR /tmp/mint
+
+RUN set -eux; \
+  wget -O binutils.tar.xz "https://tho-otto.de/download/mint/binutils-2.45-mint-20250812-bin-linux64.tar.xz"; \
+  wget -O gcc.tar.xz      "https://tho-otto.de/download/mint/gcc-4.6.4-mint-20170518-bin-linux64.tar.xz"; \
+  wget -O mintlib.tar.xz  "https://tho-otto.de/download/mint/mintlib-0.60.1-mint-20240718-dev.tar.xz"; \
+  wget -O fdlibm.tar.xz   "https://tho-otto.de/download/mint/fdlibm-20240425-mint-dev.tar.xz"; \
+  wget -O gemlib.tar.xz   "https://tho-otto.de/download/mint/gemlib-0.44.0-mint-20240425-dev.tar.xz"; \
   tar -C / -xJf binutils.tar.xz; \
   tar -C / -xJf gcc.tar.xz; \
   tar -C / -xJf mintlib.tar.xz; \
@@ -69,6 +87,35 @@ WORKDIR /work
 RUN set -eux; \
   git clone --depth 1 https://github.com/ktz-st/libcmini.elf libcmini; \
   git clone --depth 1 https://github.com/ktz-st/godlib.elf godlib
+
+WORKDIR /work/agtools
+RUN set -eux; \
+  git clone --depth 1 https://bitbucket.org/d_m_l/agtools.git .; \
+  sed -i '/#define compress_h_/a#include <cstdint>' agtsys/compress.h; \
+  cd tools/agtcut; \
+  make; \
+  cd ../packwrap ; \
+  make; \
+  cd ../pcs2agi ; \
+  make; \
+  cd ../3rdparty/lz77 ; \
+  make; \
+  cd ../zx0/ ; \
+  make; \
+  cd .. ; \
+  git clone http://tiddly.mooo.com:5000/rmac/rmac.git; \
+  cd rmac; \
+  make; \
+  cp rmac /usr/local/bin/ ; \
+  cp rmac ../../../bin/Linux/x86_64/ ; \
+  cd .. ; \
+  wget https://www.leonik.net/dml/files/pcs512_r2.zip ; \
+  unzip pcs512_r2.zip -d pcs512 ; \
+  cd pcs512/distro/source ; \
+  mkdir -p distro/Win32 ; \
+  sed -i 's/CODEGENFLAGS =/CODEGENFLAGS = -fpermissive/g' Makefile.cygwin ; \
+  bash cmake.sh ; \
+  cp pcs5.exe ../../../../../bin/Linux/x86_64/pcs ;
 
 # ---- Build and install FreePascal ----
 WORKDIR /tmp/fpc

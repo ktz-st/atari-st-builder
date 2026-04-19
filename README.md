@@ -3,8 +3,11 @@
 Docker image for building Atari ST (m68k-atari-mintelf) projects in CI.
 
 Includes:
-- MiNT ELF toolchain (binutils + gcc + dev libs) extracted to `/` from tho-otto.de tarballs
+- MiNT ELF 15.2.0 toolchain (binutils + gcc + dev libs) extracted to `/` from tho-otto.de tarballs
+- MiNT 4.6.4 toolchain (binutils + gcc + dev libs) extracted to `/` from tho-otto.de tarballs
 - `vasmm68k_mot` built from the daily VASM tarball
+- `vlink` built from the daily VLINK tarball
+- `agtools`
 - `ktz-st/libcmini.elf` cloned to `/work/libcmini`
 - `ktz-st/godlib.elf` cloned to `/work/godlib`
 - FreePascal
